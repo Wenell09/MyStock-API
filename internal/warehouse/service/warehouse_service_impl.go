@@ -26,18 +26,17 @@ func NewWarehouseService(warehouseRepository repository.WarehouseRepository, val
 
 // Create implements [WarehouseService].
 func (w *WarehouseServiceImpl) Create(request dto.WarehouseRequest) (models.Warehouse, error) {
-	publicId := uuid.New().String()
-	data := models.Warehouse{
-		PublicID: publicId,
-		Name:     request.Name,
-	}
-	if err := w.Validate.Struct(data); err != nil {
+	if err := w.Validate.Struct(request); err != nil {
 		if ve, ok := err.(validator.ValidationErrors); ok {
 			return models.Warehouse{}, utils.NewFieldError(ve)
 		}
 		return models.Warehouse{}, utils.ValidationError{
 			Msg: err.Error(),
 		}
+	}
+	data := models.Warehouse{
+		PublicID: uuid.New().String(),
+		Name:     request.Name,
 	}
 	response, err := w.WarehouseRepository.Create(data)
 	if err != nil {

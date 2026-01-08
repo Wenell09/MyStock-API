@@ -26,17 +26,18 @@ func NewCategoryService(categoryRepository repository.CategoryRepository, valida
 
 // Create implements [CategoryService].
 func (c *CategoryServiceImpl) Create(request dto.CategoryRequest) (models.Category, error) {
-	data := models.Category{
-		PublicID: uuid.New().String(),
-		Name:     request.Name,
-	}
-	if err := c.validate.Struct(data); err != nil {
+
+	if err := c.validate.Struct(request); err != nil {
 		if ve, ok := err.(validator.ValidationErrors); ok {
 			return models.Category{}, utils.NewFieldError(ve)
 		}
 		return models.Category{}, utils.ValidationError{
 			Msg: err.Error(),
 		}
+	}
+	data := models.Category{
+		PublicID: uuid.New().String(),
+		Name:     request.Name,
 	}
 	response, err := c.CategoryRepository.Create(&data)
 	if err != nil {
