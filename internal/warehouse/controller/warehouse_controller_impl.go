@@ -142,6 +142,11 @@ func (w *WarehouseControllerImpl) Update(ctx *fiber.Ctx) error {
 		})
 	}
 	response, err := w.WarehouseService.Update(publicId, request)
+	data := dto.WarehouseResponse{
+		PublicId:  response.PublicID,
+		Name:      response.Name,
+		CreatedAt: response.CreatedAt,
+	}
 	if err != nil {
 		w.Logger.Error(err.Error())
 		return utils.NewHandleError(ctx, err)
@@ -152,7 +157,7 @@ func (w *WarehouseControllerImpl) Update(ctx *fiber.Ctx) error {
 		"response": response,
 	}).Info("Success Update Warehouse!")
 	return ctx.Status(fiber.StatusOK).JSON(
-		utils.NewResponseSuccess(fiber.StatusOK, "Success Update Warehouse!", response),
+		utils.NewResponseSuccess(fiber.StatusOK, "Success Update Warehouse!", data),
 	)
 }
 
