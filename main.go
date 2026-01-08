@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/Wenell09/MyStock/cmd/api"
+	"github.com/Wenell09/MyStock/internal/api"
 	"github.com/joho/godotenv"
 )
 

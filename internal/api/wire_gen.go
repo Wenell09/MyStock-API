@@ -11,9 +11,11 @@ import (
 	"github.com/Wenell09/MyStock/internal/category/repository"
 	"github.com/Wenell09/MyStock/internal/category/service"
 	"github.com/Wenell09/MyStock/internal/database"
+	controller2 "github.com/Wenell09/MyStock/internal/warehouse/controller"
+	repository2 "github.com/Wenell09/MyStock/internal/warehouse/repository"
+	service2 "github.com/Wenell09/MyStock/internal/warehouse/service"
 	"github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/wire"
 	"github.com/sirupsen/logrus"
 )
 
@@ -27,10 +29,9 @@ func InitApp() (*fiber.App, error) {
 	categoryService := service.NewCategoryService(categoryRepository, validate)
 	logger := logrus.New()
 	categoryController := controller.NewCategoryController(categoryService, logger)
-	app := NewFiberApp(categoryController)
+	warehouseRepository := repository2.NewWarehouseRepository(db)
+	warehouseService := service2.NewWarehouseService(warehouseRepository, validate)
+	warehouseController := controller2.NewWarehouseController(warehouseService, logger)
+	app := NewFiberApp(categoryController, warehouseController)
 	return app, nil
 }
-
-// wire.go:
-
-var categorySet = wire.NewSet(repository.NewCategoryRepository, service.NewCategoryService, controller.NewCategoryController)

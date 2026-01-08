@@ -13,6 +13,14 @@ type WarehouseControllerImpl struct {
 	Logger           *logrus.Logger
 }
 
+func NewWarehouseController(warehouseService service.WarehouseService,
+	logger *logrus.Logger) WarehouseController {
+	return &WarehouseControllerImpl{
+		WarehouseService: warehouseService,
+		Logger:           logger,
+	}
+}
+
 // Create implements [WarehouseController].
 func (w *WarehouseControllerImpl) Create(ctx *fiber.Ctx) error {
 	var request dto.WarehouseRequest
