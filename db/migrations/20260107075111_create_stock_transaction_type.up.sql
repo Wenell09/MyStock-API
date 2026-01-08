@@ -1,0 +1,1 @@
+CREATE TYPE stock_transaction_type AS ENUM ('IN', 'OUT');
