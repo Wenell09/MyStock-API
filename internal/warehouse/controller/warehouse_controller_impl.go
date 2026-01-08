@@ -26,7 +26,9 @@ func (w *WarehouseControllerImpl) Create(ctx *fiber.Ctx) error {
 	var request dto.WarehouseRequest
 	if err := ctx.BodyParser(&request); err != nil {
 		w.Logger.Error(err.Error())
-		return ctx.Status(fiber.StatusNotFound).JSON(utils.NewResponseError(fiber.StatusNotFound, "Error parser body!", err.Error()))
+		return utils.NewHandleError(ctx, utils.ValidationError{
+			Msg: "Invalid request body",
+		})
 	}
 	response, err := w.WarehouseService.Create(request)
 	data := dto.WarehouseResponse{
@@ -36,10 +38,7 @@ func (w *WarehouseControllerImpl) Create(ctx *fiber.Ctx) error {
 	}
 	if err != nil {
 		w.Logger.Error(err.Error())
-		if fe, ok := err.(utils.FieldError); ok {
-			return ctx.Status(fiber.StatusBadRequest).JSON(utils.NewResponseError(fiber.StatusBadRequest, "Validation Error!", fe.Errors))
-		}
-		return utils.NewHandleError(ctx, err, "Error Create Warehouse")
+		return utils.NewHandleError(ctx, err)
 	}
 	w.Logger.WithFields(logrus.Fields{
 		"status":   fiber.StatusCreated,
@@ -56,7 +55,7 @@ func (w *WarehouseControllerImpl) Delete(ctx *fiber.Ctx) error {
 	publicId := ctx.Params("public_id")
 	if err := w.WarehouseService.Delete(publicId); err != nil {
 		w.Logger.Error(err.Error())
-		return utils.NewHandleError(ctx, err, "Error Delete Warehouse!")
+		return utils.NewHandleError(ctx, err)
 	}
 	w.Logger.WithFields(logrus.Fields{
 		"status":   fiber.StatusOK,
@@ -72,7 +71,7 @@ func (w *WarehouseControllerImpl) Delete(ctx *fiber.Ctx) error {
 func (w *WarehouseControllerImpl) DeleteAll(ctx *fiber.Ctx) error {
 	if err := w.WarehouseService.DeleteAll(); err != nil {
 		w.Logger.Error(err.Error())
-		return utils.NewHandleError(ctx, err, "Error Delete All Warehouse!")
+		return utils.NewHandleError(ctx, err)
 	}
 	w.Logger.WithFields(logrus.Fields{
 		"status":   fiber.StatusOK,
@@ -90,7 +89,7 @@ func (w *WarehouseControllerImpl) Read(ctx *fiber.Ctx) error {
 	response, err := w.WarehouseService.Read()
 	if err != nil {
 		w.Logger.Error(err.Error())
-		return utils.NewHandleError(ctx, err, "Error Get Warehouse!")
+		return utils.NewHandleError(ctx, err)
 	}
 	for _, dataResponse := range response {
 		data = append(data, dto.WarehouseResponse{
@@ -120,7 +119,7 @@ func (w *WarehouseControllerImpl) ReadByPublicId(ctx *fiber.Ctx) error {
 	}
 	if err != nil {
 		w.Logger.Error(err.Error())
-		return utils.NewHandleError(ctx, err, "Error Get Detail Warehouse!")
+		return utils.NewHandleError(ctx, err)
 	}
 	w.Logger.WithFields(logrus.Fields{
 		"status":   fiber.StatusOK,
@@ -138,12 +137,14 @@ func (w *WarehouseControllerImpl) Update(ctx *fiber.Ctx) error {
 	var request dto.WarehouseRequest
 	if err := ctx.BodyParser(&request); err != nil {
 		w.Logger.Error(err.Error())
-		return ctx.Status(fiber.StatusNotFound).JSON(utils.NewResponseError(fiber.StatusNotFound, "Error parser body!", err.Error()))
+		return utils.NewHandleError(ctx, utils.ValidationError{
+			Msg: "Invalid request body",
+		})
 	}
 	response, err := w.WarehouseService.Update(publicId, request)
 	if err != nil {
 		w.Logger.Error(err.Error())
-		return utils.NewHandleError(ctx, err, "Error Update Warehouse!")
+		return utils.NewHandleError(ctx, err)
 	}
 	w.Logger.WithFields(logrus.Fields{
 		"status":   fiber.StatusOK,

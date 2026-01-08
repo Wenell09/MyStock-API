@@ -32,11 +32,12 @@ func (w *WarehouseServiceImpl) Create(request dto.WarehouseRequest) (models.Ware
 		Name:     request.Name,
 	}
 	if err := w.Validate.Struct(data); err != nil {
-		var validationErr validator.ValidationErrors
-		if errors.As(err, &validationErr) {
-			return models.Warehouse{}, utils.NewFieldError(validationErr)
+		if ve, ok := err.(validator.ValidationErrors); ok {
+			return models.Warehouse{}, utils.NewFieldError(ve)
 		}
-		return models.Warehouse{}, err
+		return models.Warehouse{}, utils.ValidationError{
+			Msg: err.Error(),
+		}
 	}
 	response, err := w.WarehouseRepository.Create(data)
 	if err != nil {
@@ -101,11 +102,12 @@ func (w *WarehouseServiceImpl) Update(publicId string, request dto.WarehouseRequ
 		return models.Warehouse{}, utils.ValidationError{Msg: "public_id must be filled!"}
 	}
 	if err := w.Validate.Struct(request); err != nil {
-		var validationErr validator.ValidationErrors
-		if errors.As(err, &validationErr) {
-			return models.Warehouse{}, utils.NewFieldError(validationErr)
+		if ve, ok := err.(validator.ValidationErrors); ok {
+			return models.Warehouse{}, utils.NewFieldError(ve)
 		}
-		return models.Warehouse{}, err
+		return models.Warehouse{}, utils.ValidationError{
+			Msg: err.Error(),
+		}
 	}
 	response, err := w.WarehouseRepository.ReadByPublicId(publicId)
 	if err != nil {

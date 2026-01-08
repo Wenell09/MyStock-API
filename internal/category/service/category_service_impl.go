@@ -26,17 +26,17 @@ func NewCategoryService(categoryRepository repository.CategoryRepository, valida
 
 // Create implements [CategoryService].
 func (c *CategoryServiceImpl) Create(request dto.CategoryRequest) (models.Category, error) {
-	publicId := uuid.New().String()
 	data := models.Category{
-		PublicID: publicId,
+		PublicID: uuid.New().String(),
 		Name:     request.Name,
 	}
 	if err := c.validate.Struct(data); err != nil {
-		var validationErr validator.ValidationErrors
-		if errors.As(err, &validationErr) {
-			return models.Category{}, utils.NewFieldError(validationErr)
+		if ve, ok := err.(validator.ValidationErrors); ok {
+			return models.Category{}, utils.NewFieldError(ve)
 		}
-		return models.Category{}, err
+		return models.Category{}, utils.ValidationError{
+			Msg: err.Error(),
+		}
 	}
 	response, err := c.CategoryRepository.Create(&data)
 	if err != nil {
@@ -60,7 +60,6 @@ func (c *CategoryServiceImpl) Delete(publicId string) error {
 	if err := c.CategoryRepository.Delete(&response); err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -101,11 +100,12 @@ func (c *CategoryServiceImpl) Update(publicId string, request dto.CategoryReques
 		return models.Category{}, utils.ValidationError{Msg: "public_id must be filled!"}
 	}
 	if err := c.validate.Struct(request); err != nil {
-		var validationErr validator.ValidationErrors
-		if errors.As(err, &validationErr) {
-			return models.Category{}, utils.NewFieldError(validationErr)
+		if ve, ok := err.(validator.ValidationErrors); ok {
+			return models.Category{}, utils.NewFieldError(ve)
 		}
-		return models.Category{}, err
+		return models.Category{}, utils.ValidationError{
+			Msg: err.Error(),
+		}
 	}
 	response, err := c.CategoryRepository.ReadByPublicId(publicId)
 	if err != nil {

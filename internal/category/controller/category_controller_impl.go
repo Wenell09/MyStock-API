@@ -25,7 +25,9 @@ func (c *CategoryControllerImpl) Create(ctx *fiber.Ctx) error {
 	var request dto.CategoryRequest
 	if err := ctx.BodyParser(&request); err != nil {
 		c.Logger.Error(err.Error())
-		return ctx.Status(fiber.StatusNotFound).JSON(utils.NewResponseError(fiber.StatusNotFound, "Error Parser Body!", err.Error()))
+		return utils.NewHandleError(ctx, utils.ValidationError{
+			Msg: "Invalid request body",
+		})
 	}
 	response, err := c.CategoryService.Create(request)
 	data := dto.CategoryResponse{
@@ -35,17 +37,7 @@ func (c *CategoryControllerImpl) Create(ctx *fiber.Ctx) error {
 	}
 	if err != nil {
 		c.Logger.Error(err.Error())
-		// validation error
-		if fe, ok := err.(utils.FieldError); ok {
-			return ctx.Status(fiber.StatusBadRequest).JSON(
-				utils.NewResponseError(
-					fiber.StatusBadRequest,
-					"validation error",
-					fe.Errors,
-				),
-			)
-		}
-		return utils.NewHandleError(ctx, err, "Error Create New Category!")
+		return utils.NewHandleError(ctx, err)
 	}
 	c.Logger.WithFields(logrus.Fields{
 		"status":   fiber.StatusCreated,
@@ -63,9 +55,8 @@ func (c *CategoryControllerImpl) Delete(ctx *fiber.Ctx) error {
 	err := c.CategoryService.Delete(publicId)
 	if err != nil {
 		c.Logger.Error(err.Error())
-		return utils.NewHandleError(ctx, err, "Error Delete Category!")
+		return utils.NewHandleError(ctx, err)
 	}
-
 	c.Logger.WithFields(logrus.Fields{
 		"status":   200,
 		"request":  publicId,
@@ -79,7 +70,7 @@ func (c *CategoryControllerImpl) Delete(ctx *fiber.Ctx) error {
 func (c *CategoryControllerImpl) DeleteAll(ctx *fiber.Ctx) error {
 	if err := c.CategoryService.DeleteAll(); err != nil {
 		c.Logger.Error(err.Error())
-		return utils.NewHandleError(ctx, err, "Error Delete All Category!")
+		return utils.NewHandleError(ctx, err)
 	}
 	c.Logger.WithFields(logrus.Fields{
 		"status":   200,
@@ -104,7 +95,7 @@ func (c *CategoryControllerImpl) Read(ctx *fiber.Ctx) error {
 	}
 	if err != nil {
 		c.Logger.Error(err.Error())
-		return utils.NewHandleError(ctx, err, "Error Get Category!")
+		return utils.NewHandleError(ctx, err)
 	}
 	c.Logger.WithFields(logrus.Fields{
 		"status":   200,
@@ -122,8 +113,9 @@ func (c *CategoryControllerImpl) Update(ctx *fiber.Ctx) error {
 	var request dto.CategoryRequest
 	if err := ctx.BodyParser(&request); err != nil {
 		c.Logger.Error(err.Error())
-		return ctx.Status(fiber.StatusNotFound).JSON(utils.NewResponseError(fiber.StatusNotFound, "Error Parser Body!", err.Error()))
-
+		return utils.NewHandleError(ctx, utils.ValidationError{
+			Msg: "Invalid request body",
+		})
 	}
 	response, err := c.CategoryService.Update(publicId, request)
 	data := dto.CategoryResponse{
@@ -132,17 +124,8 @@ func (c *CategoryControllerImpl) Update(ctx *fiber.Ctx) error {
 		CreatedAt: response.CreatedAt,
 	}
 	if err != nil {
-		// validation error
-		if fe, ok := err.(utils.FieldError); ok {
-			return ctx.Status(fiber.StatusBadRequest).JSON(
-				utils.NewResponseError(
-					fiber.StatusBadRequest,
-					"validation error",
-					fe.Errors,
-				),
-			)
-		}
-		return utils.NewHandleError(ctx, err, "Error Update Category!")
+		c.Logger.Error(err.Error())
+		return utils.NewHandleError(ctx, err)
 	}
 	c.Logger.WithFields(logrus.Fields{
 		"status":   200,
