@@ -6,6 +6,7 @@ package api
 import (
 	"github.com/Wenell09/MyStock/internal/category"
 	"github.com/Wenell09/MyStock/internal/database"
+	"github.com/Wenell09/MyStock/internal/supplier"
 	"github.com/Wenell09/MyStock/internal/warehouse"
 	"github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
@@ -21,6 +22,7 @@ func InitApp() (*fiber.App, error) {
 		database.DBConnection,
 		category.WireSet,
 		warehouse.WireSet,
+		supplier.WireSet,
 		NewFiberApp,
 	)
 
