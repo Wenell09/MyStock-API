@@ -23,7 +23,7 @@ func NewSupplierController(supplierService service.SupplierService, logger *logr
 // Create implements [SupplierController].
 func (s *SupplierControllerImpl) Create(ctx *fiber.Ctx) error {
 	var request dto.SupplierRequest
-	if err := ctx.BodyParser(request); err != nil {
+	if err := ctx.BodyParser(&request); err != nil {
 		s.Logger.Error(err.Error())
 		return utils.NewHandleError(ctx, utils.ValidationError{Msg: "Error Parser Body!"})
 	}
@@ -122,7 +122,7 @@ func (s *SupplierControllerImpl) ReadByPublicId(ctx *fiber.Ctx) error {
 func (s *SupplierControllerImpl) Update(ctx *fiber.Ctx) error {
 	publicId := ctx.Params("public_id")
 	var request dto.SupplierRequest
-	if err := ctx.BodyParser(request); err != nil {
+	if err := ctx.BodyParser(&request); err != nil {
 		s.Logger.Error(err.Error())
 		return utils.NewHandleError(ctx, utils.ValidationError{Msg: "Error Parser Body!"})
 	}
@@ -140,8 +140,8 @@ func (s *SupplierControllerImpl) Update(ctx *fiber.Ctx) error {
 		"status":   fiber.StatusOK,
 		"request":  request,
 		"response": response,
-	}).Info("Success Get Detail Supplier!")
-	return ctx.Status(fiber.StatusOK).JSON(utils.NewResponseSuccess(fiber.StatusOK, "Success Get Detail Supplier!", data))
+	}).Info("Success Update Supplier!")
+	return ctx.Status(fiber.StatusOK).JSON(utils.NewResponseSuccess(fiber.StatusOK, "Success Update Supplier!", data))
 }
 
 var _ SupplierController = (*SupplierControllerImpl)(nil)
