@@ -9,12 +9,12 @@ func RegisterSupplierRoutes(
 	api fiber.Router,
 	controller controller.SupplierController,
 ) {
-	warehouses := api.Group("/warehouses")
+	suppliers := api.Group("/suppliers")
 
-	warehouses.Get("/", controller.Read)
-	warehouses.Get("/:public_id", controller.ReadByPublicId)
-	warehouses.Post("/", controller.Create)
-	warehouses.Patch("/:public_id", controller.Update)
-	warehouses.Delete("/", controller.DeleteAll)
-	warehouses.Delete("/:public_id", controller.Delete)
+	suppliers.Get("/", controller.Read)
+	suppliers.Get("/:public_id", controller.ReadByPublicId)
+	suppliers.Post("/", controller.Create)
+	suppliers.Patch("/:public_id", controller.Update)
+	suppliers.Delete("/", controller.DeleteAll)
+	suppliers.Delete("/:public_id", controller.Delete)
 }
