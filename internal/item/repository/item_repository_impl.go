@@ -49,7 +49,7 @@ func (i *ItemRepositoryImpl) Read() ([]models.Item, error) {
 // ReadByPublicId implements [ItemRepository].
 func (i *ItemRepositoryImpl) ReadByPublicId(publicId string) (models.Item, error) {
 	var data models.Item
-	if err := i.DB.Preload("Category").Preload("Supplier").Preload("ItemWarehouses").Preload("ItemWarehouses.Warehouse").Where("items.public_id = ?", publicId).Find(&data).Error; err != nil {
+	if err := i.DB.Preload("Category").Preload("Supplier").Preload("ItemWarehouses").Preload("ItemWarehouses.Warehouse").Where("items.public_id = ?", publicId).First(&data).Error; err != nil {
 		return models.Item{}, err
 	}
 	return data, nil
@@ -57,7 +57,11 @@ func (i *ItemRepositoryImpl) ReadByPublicId(publicId string) (models.Item, error
 
 // Update implements [ItemRepository].
 func (i *ItemRepositoryImpl) Update(item models.Item) (models.Item, error) {
-	if err := i.DB.Where("id = ?", item.ID).Updates(&item).Error; err != nil {
+	if err := i.DB.Model(&models.Item{}).Where("id = ?", item.ID).Updates(map[string]interface{}{
+		"name":        item.Name,
+		"category_id": item.CategoryID,
+		"supplier_id": item.SupplierID,
+	}).Error; err != nil {
 		return models.Item{}, err
 	}
 	return item, nil

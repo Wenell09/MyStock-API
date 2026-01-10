@@ -44,14 +44,14 @@ func (i *ItemServiceImpl) Create(request dto.ItemRequest) (models.Item, error) {
 	responseCategory, err := i.CategoryRepository.ReadByPublicId(request.CategoryPublicId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.Item{}, utils.NotFoundError{Msg: err.Error()}
+			return models.Item{}, utils.NotFoundError{Msg: "Category Not Found!"}
 		}
 		return models.Item{}, err
 	}
 	responseSupplier, err := i.SupplierRepository.ReadByPublicId(request.SupplierPublicId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.Item{}, utils.NotFoundError{Msg: err.Error()}
+			return models.Item{}, utils.NotFoundError{Msg: "Supplier Not Found!"}
 		}
 		return models.Item{}, err
 	}
@@ -76,7 +76,7 @@ func (i *ItemServiceImpl) Delete(publicId string) error {
 	response, err := i.ItemRepository.ReadByPublicId(publicId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return utils.NotFoundError{Msg: err.Error()}
+			return utils.NotFoundError{Msg: "Item Not Found!"}
 		}
 		return err
 	}
@@ -111,7 +111,7 @@ func (i *ItemServiceImpl) ReadByPublicId(publicId string) (models.Item, error) {
 	response, err := i.ItemRepository.ReadByPublicId(publicId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.Item{}, utils.NotFoundError{Msg: err.Error()}
+			return models.Item{}, utils.NotFoundError{Msg: "Item Not Found!"}
 		}
 		return models.Item{}, err
 	}
@@ -132,21 +132,21 @@ func (i *ItemServiceImpl) Update(publicId string, request dto.ItemRequest) (mode
 	response, err := i.ItemRepository.ReadByPublicId(publicId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.Item{}, utils.NotFoundError{Msg: err.Error()}
+			return models.Item{}, utils.NotFoundError{Msg: "Item Not Found!"}
 		}
 		return models.Item{}, err
 	}
 	responseCategory, err := i.CategoryRepository.ReadByPublicId(request.CategoryPublicId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.Item{}, utils.NotFoundError{Msg: err.Error()}
+			return models.Item{}, utils.NotFoundError{Msg: "Category Not Found!"}
 		}
 		return models.Item{}, err
 	}
 	responseSupplier, err := i.SupplierRepository.ReadByPublicId(request.SupplierPublicId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.Item{}, utils.NotFoundError{Msg: err.Error()}
+			return models.Item{}, utils.NotFoundError{Msg: "Supplier Not Found!"}
 		}
 		return models.Item{}, err
 	}
