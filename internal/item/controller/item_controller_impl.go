@@ -13,6 +13,14 @@ type ItemControllerImpl struct {
 	Logger      *logrus.Logger
 }
 
+func NewItemController(itemService service.ItemService,
+	logger *logrus.Logger) ItemController {
+	return &ItemControllerImpl{
+		ItemService: itemService,
+		Logger:      logger,
+	}
+}
+
 // Create implements [ItemController].
 func (i *ItemControllerImpl) Create(ctx *fiber.Ctx) error {
 	var request dto.ItemRequest

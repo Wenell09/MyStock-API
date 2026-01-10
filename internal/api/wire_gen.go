@@ -11,6 +11,9 @@ import (
 	"github.com/Wenell09/MyStock/internal/category/repository"
 	"github.com/Wenell09/MyStock/internal/category/service"
 	"github.com/Wenell09/MyStock/internal/database"
+	controller4 "github.com/Wenell09/MyStock/internal/item/controller"
+	repository4 "github.com/Wenell09/MyStock/internal/item/repository"
+	service4 "github.com/Wenell09/MyStock/internal/item/service"
 	controller3 "github.com/Wenell09/MyStock/internal/supplier/controller"
 	repository3 "github.com/Wenell09/MyStock/internal/supplier/repository"
 	service3 "github.com/Wenell09/MyStock/internal/supplier/service"
@@ -38,6 +41,9 @@ func InitApp() (*fiber.App, error) {
 	supplierRepository := repository3.NewSupplierRepository(db)
 	supplierService := service3.NewSupplierService(supplierRepository, validate)
 	supplierController := controller3.NewSupplierController(supplierService, logger)
-	app := NewFiberApp(categoryController, warehouseController, supplierController)
+	itemRepository := repository4.NewItemRepository(db)
+	itemService := service4.NewItemService(itemRepository, categoryRepository, supplierRepository, validate)
+	itemController := controller4.NewItemController(itemService, logger)
+	app := NewFiberApp(categoryController, warehouseController, supplierController, itemController)
 	return app, nil
 }

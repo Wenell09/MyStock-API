@@ -21,6 +21,18 @@ type ItemServiceImpl struct {
 	Validate           *validator.Validate
 }
 
+func NewItemService(itemRepository itemRepository.ItemRepository,
+	categoryRepository categoryRepository.CategoryRepository,
+	supplierRepository supplierRepository.SupplierRepository,
+	validate *validator.Validate) ItemService {
+	return &ItemServiceImpl{
+		ItemRepository:     itemRepository,
+		CategoryRepository: categoryRepository,
+		SupplierRepository: supplierRepository,
+		Validate:           validate,
+	}
+}
+
 // Create implements [ItemService].
 func (i *ItemServiceImpl) Create(request dto.ItemRequest) (models.Item, error) {
 	if err := i.Validate.Struct(&request); err != nil {
