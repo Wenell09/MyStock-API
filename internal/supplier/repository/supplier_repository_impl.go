@@ -55,6 +55,15 @@ func (s *SupplierRepositoryImpl) ReadByPublicId(publicId string) (models.Supplie
 	return data, nil
 }
 
+// ReadBySupplierPublicId implements [SupplierRepository].
+func (s *SupplierRepositoryImpl) ReadBySupplierPublicId(publicId string) (models.Supplier, error) {
+	var data models.Supplier
+	if err := s.DB.Preload("Items").Preload("Items.Category").Where("suppliers.public_id = ?", publicId).First(&data).Error; err != nil {
+		return models.Supplier{}, err
+	}
+	return data, nil
+}
+
 // Update implements [SupplierRepository].
 func (s *SupplierRepositoryImpl) Update(supplier models.Supplier) (models.Supplier, error) {
 	if err := s.DB.Where("id = ?", supplier.ID).Updates(&supplier).Error; err != nil {

@@ -94,6 +94,21 @@ func (s *SupplierServiceImpl) ReadByPublicId(publicId string) (models.Supplier, 
 	return response, nil
 }
 
+// ReadBySupplierPublicId implements [SupplierService].
+func (s *SupplierServiceImpl) ReadBySupplierPublicId(publicId string) (models.Supplier, error) {
+	if publicId == "" {
+		return models.Supplier{}, utils.ValidationError{Msg: "public_id must be filled!"}
+	}
+	response, err := s.SupplierRepository.ReadBySupplierPublicId(publicId)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return models.Supplier{}, utils.NotFoundError{Msg: "Supplier Not Found!"}
+		}
+		return models.Supplier{}, err
+	}
+	return response, nil
+}
+
 // Update implements [SupplierService].
 func (s *SupplierServiceImpl) Update(publicId string, request dto.SupplierRequest) (models.Supplier, error) {
 	if publicId == "" {

@@ -118,6 +118,38 @@ func (s *SupplierControllerImpl) ReadByPublicId(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(utils.NewResponseSuccess(fiber.StatusOK, "Success Get Detail Supplier!", data))
 }
 
+// ReadBySupplierPublicId implements [SupplierController].
+func (s *SupplierControllerImpl) ReadBySupplierPublicId(ctx *fiber.Ctx) error {
+	publicId := ctx.Params("public_id")
+	response, err := s.SupplierService.ReadBySupplierPublicId(publicId)
+	if err != nil {
+		s.Logger.Error(err.Error())
+		return utils.NewHandleError(ctx, err)
+	}
+	var items []dto.ItemResponse
+	for _, responseItems := range response.Items {
+		items = append(items, dto.ItemResponse{
+			PublicId: responseItems.PublicID,
+			Name:     responseItems.Name,
+			CategoryResponse: dto.CategoryResponse{
+				PublicId: responseItems.Category.PublicID,
+				Name:     responseItems.Category.Name,
+			},
+		})
+	}
+	data := dto.SupplierWithItemResponse{
+		PublicID: response.PublicID,
+		Name:     response.Name,
+		Items:    items,
+	}
+	s.Logger.WithFields(logrus.Fields{
+		"status":   fiber.StatusOK,
+		"request":  publicId,
+		"response": response,
+	}).Info("Success Get Items By Supplier!")
+	return ctx.Status(fiber.StatusOK).JSON(utils.NewResponseSuccess(fiber.StatusOK, "Success Get Items By Supplier!", data))
+}
+
 // Update implements [SupplierController].
 func (s *SupplierControllerImpl) Update(ctx *fiber.Ctx) error {
 	publicId := ctx.Params("public_id")

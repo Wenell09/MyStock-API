@@ -13,6 +13,7 @@ func RegisterSupplierRoutes(
 
 	suppliers.Get("/", controller.Read)
 	suppliers.Get("/:public_id", controller.ReadByPublicId)
+	suppliers.Get("/:public_id/items", controller.ReadBySupplierPublicId)
 	suppliers.Post("/", controller.Create)
 	suppliers.Patch("/:public_id", controller.Update)
 	suppliers.Delete("/", controller.DeleteAll)
