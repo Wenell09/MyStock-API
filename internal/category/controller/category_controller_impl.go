@@ -107,6 +107,36 @@ func (c *CategoryControllerImpl) Read(ctx *fiber.Ctx) error {
 	)
 }
 
+// ReadItemByCategoryPublicId implements [CategoryController].
+func (c *CategoryControllerImpl) ReadByCategoryPublicID(ctx *fiber.Ctx) error {
+	publicId := ctx.Params("public_id")
+	response, err := c.CategoryService.ReadByCategoryPublicID(publicId)
+	if err != nil {
+		c.Logger.Error(err.Error())
+		return utils.NewHandleError(ctx, err)
+	}
+	var items []dto.ItemResponse
+	for _, responseItems := range response.Items {
+		items = append(items, dto.ItemResponse{
+			PublicId: responseItems.PublicID,
+			Name:     responseItems.Name,
+		})
+	}
+	data := dto.CategoryWithItemsResponse{
+		PublicId: response.PublicID,
+		Name:     response.Name,
+		Items:    items,
+	}
+	c.Logger.WithFields(logrus.Fields{
+		"status":   200,
+		"request":  publicId,
+		"response": response,
+	}).Info("Success Get Items By Category!")
+	return ctx.Status(fiber.StatusOK).JSON(
+		utils.NewResponseSuccess(fiber.StatusOK, "Success Get Items By Category!", data),
+	)
+}
+
 // Update implements [CategoryController].
 func (c *CategoryControllerImpl) Update(ctx *fiber.Ctx) error {
 	publicId := ctx.Params("public_id")

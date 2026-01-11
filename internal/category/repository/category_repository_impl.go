@@ -55,6 +55,15 @@ func (c *CategoryRepositoryImpl) ReadByPublicId(publicId string) (models.Categor
 	return category, nil
 }
 
+// ReadItemByCategoryPublicId implements [CategoryRepository].
+func (c *CategoryRepositoryImpl) ReadByCategoryPublicID(publicId string) (models.Category, error) {
+	var category models.Category
+	if err := c.db.Preload("Items").Where("categories.public_id = ?", publicId).First(&category).Error; err != nil {
+		return models.Category{}, err
+	}
+	return category, nil
+}
+
 // Update implements [CategoryRepository].
 func (c *CategoryRepositoryImpl) Update(category *models.Category) (models.Category, error) {
 	if err := c.db.Where("id = ?", category.ID).Updates(&category).Error; err != nil {

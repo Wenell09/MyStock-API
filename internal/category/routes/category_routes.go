@@ -12,6 +12,7 @@ func RegisterCategoryRoutes(
 	categories := api.Group("/categories")
 
 	categories.Get("/", controller.Read)
+	categories.Get("/:public_id/items", controller.ReadByCategoryPublicID)
 	categories.Post("/", controller.Create)
 	categories.Patch("/:public_id", controller.Update)
 	categories.Delete("/", controller.DeleteAll)

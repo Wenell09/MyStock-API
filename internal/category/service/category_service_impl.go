@@ -95,6 +95,21 @@ func (c *CategoryServiceImpl) ReadByPublicID(publicId string) (models.Category, 
 	return response, nil
 }
 
+// ReadItemByCategoryPublicId implements [CategoryService].
+func (c *CategoryServiceImpl) ReadByCategoryPublicID(publicId string) (models.Category, error) {
+	if publicId == "" {
+		return models.Category{}, utils.ValidationError{Msg: "public_id must be filled!"}
+	}
+	response, err := c.CategoryRepository.ReadByCategoryPublicID(publicId)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return models.Category{}, utils.NotFoundError{Msg: "Category Not Found!"}
+		}
+		return models.Category{}, err
+	}
+	return response, nil
+}
+
 // Update implements [CategoryService].
 func (c *CategoryServiceImpl) Update(publicId string, request dto.CategoryRequest) (models.Category, error) {
 	if publicId == "" {
