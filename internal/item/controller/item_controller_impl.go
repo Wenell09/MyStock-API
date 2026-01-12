@@ -33,7 +33,7 @@ func (i *ItemControllerImpl) Create(ctx *fiber.Ctx) error {
 		i.Logger.Error(err.Error())
 		return utils.NewHandleError(ctx, err)
 	}
-	data := dto.ItemResponse{
+	data := dto.ItemCreatedOrUpdatedResponse{
 		PublicId:  response.PublicID,
 		Name:      response.Name,
 		CreatedAt: response.CreatedAt,
@@ -170,7 +170,7 @@ func (i *ItemControllerImpl) Update(ctx *fiber.Ctx) error {
 		i.Logger.Error(err.Error())
 		return utils.NewHandleError(ctx, err)
 	}
-	data := dto.ItemResponse{
+	data := dto.ItemCreatedOrUpdatedResponse{
 		PublicId:  response.PublicID,
 		Name:      response.Name,
 		CreatedAt: response.CreatedAt,
