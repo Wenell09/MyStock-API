@@ -76,7 +76,7 @@ func (s *SupplierControllerImpl) DeleteAll(ctx *fiber.Ctx) error {
 
 // Read implements [SupplierController].
 func (s *SupplierControllerImpl) Read(ctx *fiber.Ctx) error {
-	var data []dto.SupplierResponse
+	data := []dto.SupplierResponse{}
 	response, err := s.SupplierService.Read()
 	if err != nil {
 		s.Logger.Error(err.Error())
@@ -126,7 +126,7 @@ func (s *SupplierControllerImpl) ReadBySupplierPublicId(ctx *fiber.Ctx) error {
 		s.Logger.Error(err.Error())
 		return utils.NewHandleError(ctx, err)
 	}
-	var items []dto.ItemResponse
+	items := []dto.ItemResponse{}
 	for _, responseItems := range response.Items {
 		items = append(items, dto.ItemResponse{
 			PublicId: responseItems.PublicID,

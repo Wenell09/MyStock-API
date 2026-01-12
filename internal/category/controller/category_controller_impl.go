@@ -85,7 +85,7 @@ func (c *CategoryControllerImpl) DeleteAll(ctx *fiber.Ctx) error {
 // Read implements [CategoryController].
 func (c *CategoryControllerImpl) Read(ctx *fiber.Ctx) error {
 	response, err := c.CategoryService.Read()
-	var data []dto.CategoryResponse
+	data := []dto.CategoryResponse{}
 	for _, dataResponse := range response {
 		data = append(data, dto.CategoryResponse{
 			PublicId:  dataResponse.PublicID,
@@ -115,7 +115,7 @@ func (c *CategoryControllerImpl) ReadByCategoryPublicID(ctx *fiber.Ctx) error {
 		c.Logger.Error(err.Error())
 		return utils.NewHandleError(ctx, err)
 	}
-	var items []dto.ItemResponse
+	items := []dto.ItemResponse{}
 	for _, responseItems := range response.Items {
 		items = append(items, dto.ItemResponse{
 			PublicId: responseItems.PublicID,

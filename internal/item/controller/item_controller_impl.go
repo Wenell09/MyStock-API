@@ -77,14 +77,14 @@ func (i *ItemControllerImpl) DeleteAll(ctx *fiber.Ctx) error {
 
 // Read implements [ItemController].
 func (i *ItemControllerImpl) Read(ctx *fiber.Ctx) error {
-	var data []dto.ItemResponse
+	data := []dto.ItemResponse{}
 	response, err := i.ItemService.Read()
 	if err != nil {
 		i.Logger.Error(err.Error())
 		return utils.NewHandleError(ctx, err)
 	}
 	for _, responseData := range response {
-		var warehouses []dto.WarehouseResponse
+		warehouses := []dto.WarehouseResponse{}
 		for _, responseDataWarehouse := range responseData.ItemWarehouses {
 			warehouses = append(warehouses, dto.WarehouseResponse{
 				PublicId: responseDataWarehouse.Warehouse.PublicID,
@@ -125,7 +125,7 @@ func (i *ItemControllerImpl) ReadByPublicId(ctx *fiber.Ctx) error {
 		i.Logger.Error(err.Error())
 		return utils.NewHandleError(ctx, err)
 	}
-	var warehouses []dto.WarehouseResponse
+	warehouses := []dto.WarehouseResponse{}
 	for _, responseDataWarehouse := range response.ItemWarehouses {
 		warehouses = append(warehouses, dto.WarehouseResponse{
 			PublicId: responseDataWarehouse.Warehouse.PublicID,

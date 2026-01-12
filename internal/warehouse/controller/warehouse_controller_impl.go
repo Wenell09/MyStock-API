@@ -85,7 +85,7 @@ func (w *WarehouseControllerImpl) DeleteAll(ctx *fiber.Ctx) error {
 
 // Read implements [WarehouseController].
 func (w *WarehouseControllerImpl) Read(ctx *fiber.Ctx) error {
-	var data []dto.WarehouseResponse
+	data := []dto.WarehouseResponse{}
 	response, err := w.WarehouseService.Read()
 	if err != nil {
 		w.Logger.Error(err.Error())
