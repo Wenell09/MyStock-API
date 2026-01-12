@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/Wenell09/MyStock/internal/dto"
+	"github.com/Wenell09/MyStock/internal/item/dto"
 	"github.com/Wenell09/MyStock/internal/models"
 )
 

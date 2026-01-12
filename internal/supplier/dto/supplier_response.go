@@ -2,8 +2,8 @@ package dto
 
 import "time"
 
-type CategoryResponse struct {
+type SupplierResponse struct {
 	PublicId  string    `json:"public_id"`
 	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at,omitzero"`
+	CreatedAt time.Time `json:"created_at"`
 }

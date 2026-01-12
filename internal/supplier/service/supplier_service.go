@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/Wenell09/MyStock/internal/dto"
 	"github.com/Wenell09/MyStock/internal/models"
+	"github.com/Wenell09/MyStock/internal/supplier/dto"
 )
 
 type SupplierService interface {

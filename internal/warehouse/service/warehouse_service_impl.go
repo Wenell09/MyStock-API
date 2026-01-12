@@ -3,9 +3,9 @@ package service
 import (
 	"errors"
 
-	"github.com/Wenell09/MyStock/internal/dto"
 	"github.com/Wenell09/MyStock/internal/models"
 	"github.com/Wenell09/MyStock/internal/utils"
+	"github.com/Wenell09/MyStock/internal/warehouse/dto"
 	"github.com/Wenell09/MyStock/internal/warehouse/repository"
 	"github.com/go-playground/validator"
 	"github.com/google/uuid"

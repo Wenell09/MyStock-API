@@ -3,8 +3,8 @@ package service
 import (
 	"errors"
 
-	"github.com/Wenell09/MyStock/internal/dto"
 	"github.com/Wenell09/MyStock/internal/models"
+	"github.com/Wenell09/MyStock/internal/supplier/dto"
 	"github.com/Wenell09/MyStock/internal/supplier/repository"
 	"github.com/Wenell09/MyStock/internal/utils"
 	"github.com/go-playground/validator"

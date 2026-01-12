@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	categoryRepository "github.com/Wenell09/MyStock/internal/category/repository"
-	"github.com/Wenell09/MyStock/internal/dto"
+	"github.com/Wenell09/MyStock/internal/item/dto"
 	itemRepository "github.com/Wenell09/MyStock/internal/item/repository"
 	"github.com/Wenell09/MyStock/internal/models"
 	supplierRepository "github.com/Wenell09/MyStock/internal/supplier/repository"

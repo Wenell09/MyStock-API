@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/Wenell09/MyStock/internal/dto"
+	"github.com/Wenell09/MyStock/internal/supplier/dto"
 	"github.com/Wenell09/MyStock/internal/supplier/service"
 	"github.com/Wenell09/MyStock/internal/utils"
 	"github.com/gofiber/fiber/v2"
