@@ -7,6 +7,8 @@ import (
 	itemRoutes "github.com/Wenell09/MyStock/internal/item/routes"
 	supplierController "github.com/Wenell09/MyStock/internal/supplier/controller"
 	SupplierRoutes "github.com/Wenell09/MyStock/internal/supplier/routes"
+	transactionController "github.com/Wenell09/MyStock/internal/transaction/controller"
+	transactionRoutes "github.com/Wenell09/MyStock/internal/transaction/routes"
 	warehouseController "github.com/Wenell09/MyStock/internal/warehouse/controller"
 	warehouseRoutes "github.com/Wenell09/MyStock/internal/warehouse/routes"
 	"github.com/gofiber/fiber/v2"
@@ -18,7 +20,7 @@ func RegisterRoutes(
 	warehouseCtrl warehouseController.WarehouseController,
 	supplierCtrl supplierController.SupplierController,
 	itemCtrl itemController.ItemController,
-
+	transactionCtrl transactionController.TransactionController,
 ) {
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Welcome to API MyStock")
@@ -30,4 +32,5 @@ func RegisterRoutes(
 	warehouseRoutes.RegisterWarehouseRoutes(api, warehouseCtrl)
 	SupplierRoutes.RegisterSupplierRoutes(api, supplierCtrl)
 	itemRoutes.RegisterItemRoutes(api, itemCtrl)
+	transactionRoutes.RegisterTransactionRoutes(api, transactionCtrl)
 }
