@@ -78,6 +78,7 @@ func (i *ItemControllerImpl) DeleteAll(ctx *fiber.Ctx) error {
 // Read implements [ItemController].
 func (i *ItemControllerImpl) Read(ctx *fiber.Ctx) error {
 	data := []dto.ItemResponse{}
+
 	response, err := i.ItemService.Read()
 	if err != nil {
 		i.Logger.Error(err.Error())
@@ -85,10 +86,13 @@ func (i *ItemControllerImpl) Read(ctx *fiber.Ctx) error {
 	}
 	for _, responseData := range response {
 		warehouses := []dto.WarehouseResponse{}
+		totalStock := 0
 		for _, responseDataWarehouse := range responseData.ItemWarehouses {
+			totalStock += responseDataWarehouse.Stock
 			warehouses = append(warehouses, dto.WarehouseResponse{
 				PublicId: responseDataWarehouse.Warehouse.PublicID,
 				Name:     responseDataWarehouse.Warehouse.Name,
+				Stock:    responseDataWarehouse.Stock,
 			})
 		}
 		data = append(data, dto.ItemResponse{
@@ -103,6 +107,7 @@ func (i *ItemControllerImpl) Read(ctx *fiber.Ctx) error {
 				Name:     responseData.Supplier.Name,
 			},
 			WarehouseResponse: warehouses,
+			TotalStock:        totalStock,
 			CreatedAt:         responseData.CreatedAt,
 		})
 	}
@@ -125,11 +130,14 @@ func (i *ItemControllerImpl) ReadByPublicId(ctx *fiber.Ctx) error {
 		i.Logger.Error(err.Error())
 		return utils.NewHandleError(ctx, err)
 	}
+	totalStock := 0
 	warehouses := []dto.WarehouseResponse{}
 	for _, responseDataWarehouse := range response.ItemWarehouses {
+		totalStock += responseDataWarehouse.Stock
 		warehouses = append(warehouses, dto.WarehouseResponse{
 			PublicId: responseDataWarehouse.Warehouse.PublicID,
 			Name:     responseDataWarehouse.Warehouse.Name,
+			Stock:    responseDataWarehouse.Stock,
 		})
 	}
 	data := dto.ItemResponse{
@@ -143,6 +151,7 @@ func (i *ItemControllerImpl) ReadByPublicId(ctx *fiber.Ctx) error {
 			PublicId: response.Supplier.PublicID,
 			Name:     response.Supplier.Name,
 		},
+		TotalStock:        totalStock,
 		WarehouseResponse: warehouses,
 		CreatedAt:         response.CreatedAt,
 	}

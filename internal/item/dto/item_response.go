@@ -8,5 +8,6 @@ type ItemResponse struct {
 	CategoryResponse  CategoryResponse    `json:"category"`
 	SupplierResponse  SupplierResponse    `json:"supplier"`
 	WarehouseResponse []WarehouseResponse `json:"warehouses"`
+	TotalStock        int                 `json:"total_stock"`
 	CreatedAt         time.Time           `json:"created_at"`
 }
