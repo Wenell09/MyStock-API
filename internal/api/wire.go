@@ -10,6 +10,7 @@ import (
 	"github.com/Wenell09/MyStock/internal/supplier"
 	"github.com/Wenell09/MyStock/internal/warehouse"
 	"github.com/Wenell09/MyStock/internal/transaction"
+	"github.com/Wenell09/MyStock/internal/dashboard"
 	"github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/wire"
@@ -27,6 +28,7 @@ func InitApp() (*fiber.App, error) {
 		supplier.WireSet,
 		item.WireSet,
 		transaction.WireSet,
+		dashboard.WireSet,
 		NewFiberApp,
 	)
 

@@ -2,6 +2,7 @@ package api
 
 import (
 	categoryController "github.com/Wenell09/MyStock/internal/category/controller"
+	dashboardController "github.com/Wenell09/MyStock/internal/dashboard/controller"
 	itemController "github.com/Wenell09/MyStock/internal/item/controller"
 	supplierController "github.com/Wenell09/MyStock/internal/supplier/controller"
 	transactionController "github.com/Wenell09/MyStock/internal/transaction/controller"
@@ -16,6 +17,7 @@ func NewFiberApp(
 	supplierCtrl supplierController.SupplierController,
 	itemCtrl itemController.ItemController,
 	transactionCtrl transactionController.TransactionController,
+	dashboardCtrl dashboardController.DashboardController,
 ) *fiber.App {
 
 	app := fiber.New()
@@ -27,7 +29,7 @@ func NewFiberApp(
 		AllowMethods: "GET, POST, PUT, DELETE, OPTIONS",
 	}))
 
-	RegisterRoutes(app, categoryCtrl, warehouseCtrl, supplierCtrl, itemCtrl, transactionCtrl)
+	RegisterRoutes(app, categoryCtrl, warehouseCtrl, supplierCtrl, itemCtrl, transactionCtrl, dashboardCtrl)
 
 	return app
 }
