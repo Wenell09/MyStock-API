@@ -13,6 +13,7 @@ func RegisterWarehouseRoutes(
 
 	warehouses.Get("/", controller.Read)
 	warehouses.Get("/:public_id", controller.ReadByPublicId)
+	warehouses.Get("/:public_id/items", controller.ReadByWarehousePublicId)
 	warehouses.Post("/", controller.Create)
 	warehouses.Patch("/:public_id", controller.Update)
 	warehouses.Delete("/", controller.DeleteAll)

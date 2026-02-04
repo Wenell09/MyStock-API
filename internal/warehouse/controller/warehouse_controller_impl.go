@@ -34,6 +34,7 @@ func (w *WarehouseControllerImpl) Create(ctx *fiber.Ctx) error {
 	data := dto.WarehouseResponse{
 		PublicId:  response.PublicID,
 		Name:      response.Name,
+		Location:  response.Location,
 		CreatedAt: response.CreatedAt,
 	}
 	if err != nil {
@@ -95,6 +96,7 @@ func (w *WarehouseControllerImpl) Read(ctx *fiber.Ctx) error {
 		data = append(data, dto.WarehouseResponse{
 			PublicId:  dataResponse.PublicID,
 			Name:      dataResponse.Name,
+			Location:  dataResponse.Location,
 			CreatedAt: dataResponse.CreatedAt,
 		})
 	}
@@ -115,6 +117,7 @@ func (w *WarehouseControllerImpl) ReadByPublicId(ctx *fiber.Ctx) error {
 	data := dto.WarehouseResponse{
 		PublicId:  response.PublicID,
 		Name:      response.Name,
+		Location:  response.Location,
 		CreatedAt: response.CreatedAt,
 	}
 	if err != nil {
@@ -125,9 +128,52 @@ func (w *WarehouseControllerImpl) ReadByPublicId(ctx *fiber.Ctx) error {
 		"status":   fiber.StatusOK,
 		"request":  nil,
 		"response": response,
-	}).Info("Success Get Warehouse!")
+	}).Info("Success Get Detail Warehouse!")
 	return ctx.Status(fiber.StatusOK).JSON(
-		utils.NewResponseSuccess(fiber.StatusOK, "Success Get Warehouse!", data),
+		utils.NewResponseSuccess(fiber.StatusOK, "Success Get Detail Warehouse!", data),
+	)
+}
+
+// ReadByWarehousePublicId implements [WarehouseController].
+func (w *WarehouseControllerImpl) ReadByWarehousePublicId(ctx *fiber.Ctx) error {
+	publicId := ctx.Params("public_id")
+	response, err := w.WarehouseService.ReadByWarehousePublicId(publicId)
+	if err != nil {
+		w.Logger.Error(err.Error())
+		return utils.NewHandleError(ctx, err)
+	}
+	items := []dto.ItemResponse{}
+	totalStock := 0
+	for _, responseItems := range response.ItemWarehouses {
+		totalStock += responseItems.Stock
+		items = append(items, dto.ItemResponse{
+			PublicId: responseItems.Item.PublicID,
+			Name:     responseItems.Item.Name,
+			CategoryResponse: dto.CategoryResponse{
+				PublicId: responseItems.Item.Category.PublicID,
+				Name:     responseItems.Item.Category.Name,
+			},
+			SupplierResponse: dto.SupplierResponse{
+				PublicId: responseItems.Item.Supplier.PublicID,
+				Name:     responseItems.Item.Supplier.Name,
+			},
+			Stock: responseItems.Stock,
+		})
+	}
+	data := dto.WarehouseWithItemsResponse{
+		PublicId:   response.PublicID,
+		Name:       response.Name,
+		Location:   response.Location,
+		Items:      items,
+		TotalStock: totalStock,
+	}
+	w.Logger.WithFields(logrus.Fields{
+		"status":   fiber.StatusOK,
+		"request":  nil,
+		"response": data,
+	}).Info("Success Get Detail Warehouse with Items!")
+	return ctx.Status(fiber.StatusOK).JSON(
+		utils.NewResponseSuccess(fiber.StatusOK, "Success Get Detail Warehouse  with Items!", data),
 	)
 }
 
@@ -145,6 +191,7 @@ func (w *WarehouseControllerImpl) Update(ctx *fiber.Ctx) error {
 	data := dto.WarehouseResponse{
 		PublicId:  response.PublicID,
 		Name:      response.Name,
+		Location:  response.Location,
 		CreatedAt: response.CreatedAt,
 	}
 	if err != nil {

@@ -95,6 +95,21 @@ func (w *WarehouseServiceImpl) ReadByPublicId(publicId string) (models.Warehouse
 	return response, nil
 }
 
+// ReadByWarehousePublicId implements [WarehouseService].
+func (w *WarehouseServiceImpl) ReadByWarehousePublicId(publicId string) (models.Warehouse, error) {
+	if publicId == "" {
+		return models.Warehouse{}, utils.ValidationError{Msg: "public_id must be filled!"}
+	}
+	response, err := w.WarehouseRepository.ReadByWarehousePublicId(publicId)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return models.Warehouse{}, utils.NotFoundError{Msg: "Warehouse Not Found!"}
+		}
+		return models.Warehouse{}, err
+	}
+	return response, nil
+}
+
 // Update implements [WarehouseService].
 func (w *WarehouseServiceImpl) Update(publicId string, request dto.WarehouseRequest) (models.Warehouse, error) {
 	if publicId == "" {

@@ -56,6 +56,15 @@ func (w *WarehouseRepositoryImpl) ReadByPublicId(publicId string) (models.Wareho
 	return data, nil
 }
 
+// ReadByWarehousePublicId implements [WarehouseRepository].
+func (w *WarehouseRepositoryImpl) ReadByWarehousePublicId(publicId string) (models.Warehouse, error) {
+	var data models.Warehouse
+	if err := w.DB.Preload("ItemWarehouses").Preload("ItemWarehouses.Item").Preload("ItemWarehouses.Item.Category").Preload("ItemWarehouses.Item.Supplier").Where("public_id = ?", publicId).First(&data).Error; err != nil {
+		return models.Warehouse{}, err
+	}
+	return data, nil
+}
+
 // Update implements [WarehouseRepository].
 func (w *WarehouseRepositoryImpl) Update(Warehouse models.Warehouse) (models.Warehouse, error) {
 	if err := w.DB.Where("id = ?", Warehouse.ID).Updates(&Warehouse).Error; err != nil {
