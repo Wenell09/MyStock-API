@@ -1,6 +1,8 @@
 package api
 
 import (
+	authController "github.com/Wenell09/MyStock/internal/auth/controller"
+	authRoutes "github.com/Wenell09/MyStock/internal/auth/routes"
 	categoryController "github.com/Wenell09/MyStock/internal/category/controller"
 	categoryRoutes "github.com/Wenell09/MyStock/internal/category/routes"
 	dashboardController "github.com/Wenell09/MyStock/internal/dashboard/controller"
@@ -24,11 +26,11 @@ func RegisterRoutes(
 	itemCtrl itemController.ItemController,
 	transactionCtrl transactionController.TransactionController,
 	dashboardCtrl dashboardController.DashboardController,
+	authCtrl authController.AuthController,
 ) {
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Welcome to API MyStock")
 	})
-
 	api := app.Group("/api")
 
 	categoryRoutes.RegisterCategoryRoutes(api, categoryCtrl)
@@ -37,4 +39,5 @@ func RegisterRoutes(
 	itemRoutes.RegisterItemRoutes(api, itemCtrl)
 	transactionRoutes.RegisterTransactionRoutes(api, transactionCtrl)
 	dashboardRoutes.RegisterDashboardRoutes(api, dashboardCtrl)
+	authRoutes.RegisterAuthRoutes(api, authCtrl)
 }

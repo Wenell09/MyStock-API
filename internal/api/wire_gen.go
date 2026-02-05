@@ -7,6 +7,10 @@
 package api
 
 import (
+	controller7 "github.com/Wenell09/MyStock/internal/auth/controller"
+	"github.com/Wenell09/MyStock/internal/auth/provider"
+	repository7 "github.com/Wenell09/MyStock/internal/auth/repository"
+	service7 "github.com/Wenell09/MyStock/internal/auth/service"
 	"github.com/Wenell09/MyStock/internal/category/controller"
 	"github.com/Wenell09/MyStock/internal/category/repository"
 	"github.com/Wenell09/MyStock/internal/category/service"
@@ -57,6 +61,10 @@ func InitApp() (*fiber.App, error) {
 	dashboardRepository := repository6.NewDashboardRepository(db)
 	dashboardService := service6.NewDashboardService(dashboardRepository)
 	dashboardController := controller6.NewDashboardController(dashboardService, logger)
-	app := NewFiberApp(categoryController, warehouseController, supplierController, itemController, transactionController, dashboardController)
+	authRepository := repository7.NewAuthRepository(db)
+	authProvider := provider.NewAuthProvider()
+	authService := service7.NewAuthService(authRepository, authProvider, validate)
+	authController := controller7.NewAuthController(authService, logger)
+	app := NewFiberApp(categoryController, warehouseController, supplierController, itemController, transactionController, dashboardController, authController)
 	return app, nil
 }

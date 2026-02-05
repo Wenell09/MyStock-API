@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/Wenell09/MyStock/internal/category/controller"
+	"github.com/Wenell09/MyStock/internal/middleware"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -9,7 +10,7 @@ func RegisterCategoryRoutes(
 	api fiber.Router,
 	controller controller.CategoryController,
 ) {
-	categories := api.Group("/categories")
+	categories := api.Group("/categories", middleware.Auth())
 
 	categories.Get("/", controller.Read)
 	categories.Get("/:public_id/items", controller.ReadByCategoryPublicID)

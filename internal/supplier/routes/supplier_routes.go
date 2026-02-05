@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"github.com/Wenell09/MyStock/internal/middleware"
 	"github.com/Wenell09/MyStock/internal/supplier/controller"
 	"github.com/gofiber/fiber/v2"
 )
@@ -9,7 +10,7 @@ func RegisterSupplierRoutes(
 	api fiber.Router,
 	controller controller.SupplierController,
 ) {
-	suppliers := api.Group("/suppliers")
+	suppliers := api.Group("/suppliers", middleware.Auth())
 
 	suppliers.Get("/", controller.Read)
 	suppliers.Get("/:public_id", controller.ReadByPublicId)
