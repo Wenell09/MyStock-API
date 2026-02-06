@@ -37,6 +37,7 @@ func (w *WarehouseServiceImpl) Create(request dto.WarehouseRequest) (models.Ware
 	data := models.Warehouse{
 		PublicID: uuid.New().String(),
 		Name:     request.Name,
+		Location: request.Location,
 	}
 	response, err := w.WarehouseRepository.Create(data)
 	if err != nil {
@@ -131,6 +132,7 @@ func (w *WarehouseServiceImpl) Update(publicId string, request dto.WarehouseRequ
 		return models.Warehouse{}, err
 	}
 	response.Name = request.Name
+	response.Location = request.Location
 	response, err = w.WarehouseRepository.Update(response)
 	if err != nil {
 		return models.Warehouse{}, err
