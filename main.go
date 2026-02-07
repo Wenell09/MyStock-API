@@ -2,19 +2,22 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/Wenell09/MyStock/internal/api"
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	_ = godotenv.Load()
 	app, err := api.InitApp()
 	if err != nil {
 		log.Fatal(err)
 	}
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8000"
+	}
 
-	log.Fatal(app.Listen(":8000"))
+	log.Fatal(app.Listen(":" + port))
 }
