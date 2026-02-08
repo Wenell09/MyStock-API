@@ -12,16 +12,17 @@ func Auth() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
 		if !strings.HasPrefix(authHeader, "Bearer ") {
-			return c.Status(fiber.StatusUnauthorized).
-				JSON(utils.NewResponseError(fiber.StatusUnauthorized, "Unauthorized", "Token Empty!"))
+			return c.Status(401).JSON(utils.NewResponseError(401, "Unauthorized", "Token Empty!"))
 		}
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		jwkSet, err := GetJWKSet()
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).
-				JSON(utils.NewResponseError(500, "Error", err.Error()))
+			return c.Status(500).JSON(utils.NewResponseError(500, "Error", err.Error()))
 		}
+		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+			if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
+				return nil, fiber.ErrUnauthorized
+			}
 			kidVal, ok := t.Header["kid"]
 			if !ok {
 				return nil, fiber.ErrUnauthorized
@@ -41,14 +42,11 @@ func Auth() fiber.Handler {
 			return raw, nil
 		})
 		if err != nil || !token.Valid {
-			return c.Status(fiber.StatusUnauthorized).
-				JSON(utils.NewResponseError(fiber.StatusUnauthorized, "Unauthorized", "Token Invalid!"))
+			return c.Status(401).JSON(utils.NewResponseError(401, "Unauthorized", "Token Invalid!"))
 		}
-
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
-			return c.Status(fiber.StatusUnauthorized).
-				JSON(utils.NewResponseError(fiber.StatusUnauthorized, "Unauthorized", "Invalid token claims"))
+			return c.Status(401).JSON(utils.NewResponseError(401, "Unauthorized", "Invalid token claims"))
 		}
 		c.Locals("user_id", claims["sub"])
 		c.Locals("email", claims["email"])
