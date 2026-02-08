@@ -1,13 +1,50 @@
 package middleware
 
 import (
-	"log"
+	"encoding/json"
+	"errors"
+	"net/http"
+	"os"
 	"strings"
+	"time"
 
 	"github.com/Wenell09/MyStock/internal/utils"
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 )
+
+type SupabaseUser struct {
+	ID    string `json:"id"`
+	Email string `json:"email"`
+}
+
+func validateTokenSupabase(token string) (*SupabaseUser, error) {
+	url := os.Getenv("SUPABASE_URL")
+	anonKey := os.Getenv("SUPABASE_ANON_KEY")
+	if url == "" || anonKey == "" {
+		return nil, errors.New("SUPABASE_URL or SUPABASE_ANON_KEY not set")
+	}
+	req, _ := http.NewRequest("GET", url+"/auth/v1/user", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("apikey", anonKey)
+
+	client := &http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return nil, errors.New("invalid token")
+	}
+	var user SupabaseUser
+	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
+		return nil, err
+	}
+	if user.ID == "" {
+		return nil, errors.New("invalid token: missing user id")
+	}
+	return &user, nil
+}
 
 func Auth() fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -15,66 +52,14 @@ func Auth() fiber.Handler {
 		if !strings.HasPrefix(authHeader, "Bearer ") {
 			return c.Status(401).JSON(utils.NewResponseError(401, "Unauthorized", "Token missing"))
 		}
-
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-
-		jwkSet, err := GetJWKSet()
-		if err != nil || jwkSet == nil {
-			log.Println("[AUTH] JWKS error:", err)
-			return c.Status(500).JSON(utils.NewResponseError(500, "Error", "Auth service unavailable"))
-		}
-
-		claims := jwt.MapClaims{}
-		parser := jwt.NewParser(jwt.WithValidMethods([]string{"RS256"}))
-		token, err := parser.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
-			// --- Defensive nil checks
-			if t == nil || t.Header == nil {
-				return nil, fiber.ErrUnauthorized
-			}
-
-			kidVal, ok := t.Header["kid"]
-			if !ok || kidVal == nil {
-				return nil, fiber.ErrUnauthorized
-			}
-
-			kid, ok := kidVal.(string)
-			if !ok || kid == "" {
-				return nil, fiber.ErrUnauthorized
-			}
-
-			if jwkSet == nil {
-				return nil, fiber.ErrUnauthorized
-			}
-
-			key, ok := jwkSet.LookupKeyID(kid)
-			if !ok || key == nil {
-				return nil, fiber.ErrUnauthorized
-			}
-
-			var raw interface{}
-			if err := key.Raw(&raw); err != nil || raw == nil {
-				return nil, fiber.ErrUnauthorized
-			}
-
-			return raw, nil
-		})
-
-		if err != nil || token == nil || !token.Valid {
+		token := strings.TrimPrefix(authHeader, "Bearer ")
+		user, err := validateTokenSupabase(token)
+		if err != nil {
 			return c.Status(401).JSON(utils.NewResponseError(401, "Unauthorized", "Invalid token"))
 		}
 
-		sub, ok := claims["sub"].(string)
-		if !ok || sub == "" {
-			return c.Status(401).JSON(utils.NewResponseError(401, "Unauthorized", "Invalid token subject"))
-		}
-
-		email := ""
-		if v, ok := claims["email"]; ok && v != nil {
-			email, _ = v.(string)
-		}
-
-		c.Locals("user_id", sub)
-		c.Locals("email", email)
+		c.Locals("user_id", user.ID)
+		c.Locals("email", user.Email)
 
 		return c.Next()
 	}
