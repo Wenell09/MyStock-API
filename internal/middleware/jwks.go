@@ -20,6 +20,7 @@ var (
 func GetJWKSet() (jwk.Set, error) {
 	jwksURL := os.Getenv("SUPABASE_JWKS_URL")
 	if jwksURL == "" {
+		log.Println("[JWKS] ENV SUPABASE_JWKS_URL not set")
 		return nil, errors.New("SUPABASE_JWKS_URL not set")
 	}
 	mutex.RLock()
@@ -41,6 +42,7 @@ func GetJWKSet() (jwk.Set, error) {
 			log.Println("[JWKS] fetch failed, using cache:", err)
 			return jwkSet, nil
 		}
+		log.Println("[JWKS] fetch failed and no cache:", err)
 		return nil, err
 	}
 	jwkSet = set

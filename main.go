@@ -10,8 +10,8 @@ import (
 )
 
 func main() {
-	if os.Getenv("APP_ENV") != "production" {
-		_ = godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found")
 	}
 	port := os.Getenv("PORT")
 	if port == "" {
