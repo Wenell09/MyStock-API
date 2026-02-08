@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/Wenell09/MyStock/internal/api"
-	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 )
 
@@ -17,15 +16,10 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	app := fiber.New()
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Booting...")
-	})
-	fullApp, err := api.InitApp()
+	app, err := api.InitApp()
 	if err != nil {
-		log.Fatal("InitApp failed:", err)
+		log.Fatal(err)
 	}
-	app.Mount("/", fullApp)
 	log.Println("Server listening on port", port)
 	log.Fatal(app.Listen(":" + port))
 }
