@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"log"
 	"strings"
 
 	"github.com/Wenell09/MyStock/internal/utils"
@@ -12,22 +13,23 @@ func Auth() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
 		if !strings.HasPrefix(authHeader, "Bearer ") {
-			return c.Status(401).JSON(utils.NewResponseError(401, "Unauthorized", "Token Empty!"))
-		}
-		jwkSet, err := GetJWKSet()
-		if err != nil {
-			return c.Status(500).JSON(utils.NewResponseError(500, "Error", err.Error()))
+			return c.Status(fiber.StatusUnauthorized).
+				JSON(utils.NewResponseError(401, "Unauthorized", "Token missing"))
 		}
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
-			if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
-				return nil, fiber.ErrUnauthorized
-			}
-			kidVal, ok := t.Header["kid"]
-			if !ok {
-				return nil, fiber.ErrUnauthorized
-			}
-			kid, ok := kidVal.(string)
+		jwkSet, err := GetJWKSet()
+		if err != nil {
+			log.Println("[AUTH] JWKS error:", err)
+			return c.Status(500).
+				JSON(utils.NewResponseError(500, "Error", "Auth service unavailable"))
+		}
+		parser := jwt.NewParser(
+			jwt.WithValidMethods([]string{"RS256"}),
+			jwt.WithAudience("authenticated"),
+		)
+		claims := jwt.MapClaims{}
+		token, err := parser.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
+			kid, ok := t.Header["kid"].(string)
 			if !ok {
 				return nil, fiber.ErrUnauthorized
 			}
@@ -42,14 +44,18 @@ func Auth() fiber.Handler {
 			return raw, nil
 		})
 		if err != nil || !token.Valid {
-			return c.Status(401).JSON(utils.NewResponseError(401, "Unauthorized", "Token Invalid!"))
+			return c.Status(401).
+				JSON(utils.NewResponseError(401, "Unauthorized", "Invalid token"))
 		}
-		claims, ok := token.Claims.(jwt.MapClaims)
+		sub, ok := claims["sub"].(string)
 		if !ok {
-			return c.Status(401).JSON(utils.NewResponseError(401, "Unauthorized", "Invalid token claims"))
+			return c.Status(401).
+				JSON(utils.NewResponseError(401, "Unauthorized", "Invalid token subject"))
 		}
-		c.Locals("user_id", claims["sub"])
-		c.Locals("email", claims["email"])
+		email, _ := claims["email"].(string)
+		c.Locals("user_id", sub)
+		c.Locals("email", email)
+
 		return c.Next()
 	}
 }

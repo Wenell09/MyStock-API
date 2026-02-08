@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"time"
 )
 
 type AuthProviderImpl struct{}
@@ -15,7 +16,7 @@ func NewAuthProvider() AuthProvider {
 }
 
 // Login implements [AuthProvider].
-func (a *AuthProviderImpl) Login(email string, password string) (string, error) {
+func (a *AuthProviderImpl) Login(email, password string) (string, error) {
 	url := os.Getenv("SUPABASE_URL")
 	if url == "" {
 		return "", errors.New("SUPABASE_URL empty")
@@ -35,19 +36,25 @@ func (a *AuthProviderImpl) Login(email string, password string) (string, error) 
 	}
 	req.Header.Set("apikey", os.Getenv("SUPABASE_ANON_KEY"))
 	req.Header.Set("Content-Type", "application/json")
-	resp, err := http.DefaultClient.Do(req)
+	client := &http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Do(req)
 	if err != nil {
 		return "", err
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		return "", errors.New("invalid credentials")
-	}
 	var res struct {
 		AccessToken string `json:"access_token"`
+		Error       string `json:"error"`
+		ErrorDesc   string `json:"error_description"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return "", err
+	}
+	if res.AccessToken == "" {
+		if res.ErrorDesc != "" {
+			return "", errors.New(res.ErrorDesc)
+		}
+		return "", errors.New("login failed")
 	}
 	return res.AccessToken, nil
 }

@@ -14,25 +14,31 @@ import (
 var (
 	jwkSet   jwk.Set
 	lastLoad time.Time
-	mutex    sync.Mutex
+	mutex    sync.RWMutex
 )
 
 func GetJWKSet() (jwk.Set, error) {
 	jwksURL := os.Getenv("SUPABASE_JWKS_URL")
 	if jwksURL == "" {
-		return nil, errors.New("SUPABASE_JWKS_URL is not set")
+		return nil, errors.New("SUPABASE_JWKS_URL not set")
 	}
+	mutex.RLock()
+	if jwkSet != nil && time.Since(lastLoad) < time.Hour {
+		defer mutex.RUnlock()
+		return jwkSet, nil
+	}
+	mutex.RUnlock()
 	mutex.Lock()
 	defer mutex.Unlock()
 	if jwkSet != nil && time.Since(lastLoad) < time.Hour {
 		return jwkSet, nil
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	set, err := jwk.Fetch(ctx, jwksURL)
 	if err != nil {
 		if jwkSet != nil {
-			log.Println("[JWKS] fetch failed, using cached keys:", err)
+			log.Println("[JWKS] fetch failed, using cache:", err)
 			return jwkSet, nil
 		}
 		return nil, err
