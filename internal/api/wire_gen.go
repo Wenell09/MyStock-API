@@ -39,10 +39,7 @@ import (
 
 // Injector
 func InitApp() (*fiber.App, error) {
-	db, err := database.DBConnection()
-	if err != nil {
-		return nil, err
-	}
+	db := database.DBConnection()
 	categoryRepository := repository.NewCategoryRepository(db)
 	validate := validator.New()
 	categoryService := service.NewCategoryService(categoryRepository, validate)

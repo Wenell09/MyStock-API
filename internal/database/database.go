@@ -1,9 +1,7 @@
 package database
 
 import (
-	"context"
-	"errors"
-	"log"
+	"fmt"
 	"os"
 	"time"
 
@@ -12,35 +10,23 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-func DBConnection() (*gorm.DB, error) {
+func DBConnection() *gorm.DB {
 	dsn := os.Getenv("DATABASE_URL")
-	if dsn == "" {
-		return nil, errors.New("DATABASE_URL is not set")
-	}
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
+		Logger: logger.Default.LogMode(logger.Info),
 	})
 	if err != nil {
-		return nil, err
+		panic("cant connect to DB 🚀")
 	}
-	sqlDB, err := db.DB()
-	if err != nil {
-		return nil, err
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := sqlDB.PingContext(ctx); err != nil {
-		return nil, err
-	}
+	fmt.Println("success connect database 🚀")
+	sqlDB, _ := db.DB()
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(time.Hour)
-	log.Println("Database connected")
-	return db, nil
+	return db
+	// migrate db
+	//  migrate -database "database_url" -path db/migrations up
+
+	// create migrations
+	// migrate create -ext sql -dir db/migrations create_name_table
 }
-
-// migrate db
-//  migrate -database "database_url" -path db/migrations up
-
-// create migrations
-// migrate create -ext sql -dir db/migrations create_name_table
