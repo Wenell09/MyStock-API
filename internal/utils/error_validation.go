@@ -1,13 +1,11 @@
 package utils
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
 )
 
+// validation manual
 type ValidationError struct {
 	Msg string
 }
@@ -28,14 +26,43 @@ func (v ValidationError) ErrorData() interface{} {
 	return v.Msg
 }
 
+// validation menggunakan validator
+type FieldDetail struct {
+	Field string `json:"field"`
+	Error string `json:"error"`
+}
+
+type FieldError struct {
+	Errors []FieldDetail `json:"errors"`
+}
+
+func (f FieldError) Error() string {
+	return "validation error"
+}
+
+func (f FieldError) StatusCode() int {
+	return fiber.StatusBadRequest
+}
+
+func (f FieldError) ResponseMessage() string {
+	return "Validation Error"
+}
+
+func (f FieldError) ErrorData() interface{} {
+	return f.Errors
+}
+
 func NewFieldError(validationErr validator.ValidationErrors) error {
-	var messages []string
+	dataErr := []FieldDetail{}
+
 	for _, fieldErr := range validationErr {
-		messages = append(messages,
-			fmt.Sprintf("%s %s", fieldErr.Field(), fieldErr.Tag()),
-		)
+		dataErr = append(dataErr, FieldDetail{
+			Field: fieldErr.Field(),
+			Error: fieldErr.Tag(),
+		})
 	}
-	return ValidationError{
-		Msg: strings.Join(messages, ", "),
+
+	return FieldError{
+		Errors: dataErr,
 	}
 }
