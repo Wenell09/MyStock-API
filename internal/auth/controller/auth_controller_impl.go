@@ -44,11 +44,11 @@ func (a *AuthControllerImpl) Login(ctx *fiber.Ctx) error {
 		Token: ResponseToken,
 	}
 	a.Logger.WithFields(logrus.Fields{
-		"status":   fiber.StatusCreated,
+		"status":   fiber.StatusOK,
 		"request":  request,
 		"response": data,
 	}).Info("Login Success!")
-	return ctx.Status(fiber.StatusCreated).JSON(
-		utils.NewResponseSuccess(fiber.StatusCreated, "Login Success!", data),
+	return ctx.Status(fiber.StatusOK).JSON(
+		utils.NewResponseSuccess(fiber.StatusOK, "Login Success!", data),
 	)
 }
